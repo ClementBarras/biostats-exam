@@ -1,0 +1,146 @@
+---
+title: "Analyse en Composantes Principales"
+author: "Biostat_OBT_OMA"
+date: "11 mars 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Le jeu de données diabètes
+
+On charge dans un premier temps les packges et le jeu de données diabètes
+
+
+```{r cars}
+library(factoextra)
+library(lars)
+library(pls)
+data(diabetes)
+X = as.matrix(diabetes$x)
+y = diabetes$y
+```
+
+# ACP sur le jeu de données diabètes
+
+```{r}
+fit.pca = prcomp(X, scale = TRUE)
+summary(fit.pca)
+```
+
+la figure suivante traduit l'évolution du pourcentage de variance capturée pa les différentes composantes.
+
+```{r}
+screeplot(fit.pca)
+```
+
+Ce résumé nous indique que la première composante principale caputre envrion 40% de l'information et que la deuxième composante capture envrion 15% d'information en plus.
+
+Les axes principaux $\mathbf w$ sont stockés dans `fit.pca$rotation`
+
+```{r}
+fit.pca$rotation
+```
+
+Les composantes principales $\mathbf y$ sont stockées dans `fit.pca$x`
+
+```{r}
+head(fit.pca$x)
+```
+
+Pour finir, on visualiser individus et variables au travers de la carte des individus
+
+```{r}
+fviz_pca_ind(fit.pca, col.ind = y)
+```
+
+la carte des variables (aussi nommée le cercle des corrélations)
+
+```{r}
+fviz_pca_var(fit.pca, repel = TRUE)
+```
+
+Le biplot superpose carte des individus et des variables
+
+
+```{r}
+fviz_pca_biplot(fit.pca, col.ind = y)
+```
+
+
+# PLS sur le jeu de données diabètes
+
+On se propose de tester la régression pour comprendre et prédire les relations entre l'ensemble des variables explicatives et la sévérité du diabète.
+
+```{r}
+fit.pls =plsr(y~X, ncomp = 1, scale = TRUE)
+```
+
+On retrouve les composantes PLS manuellement comme suit : 
+
+```{r}
+w = cov(X, y)
+w = w/sqrt(drop(crossprod(ww)))
+```
+
+et que l'on compare ensuite aux valeurs renvoyées par la fonction `plsr`
+
+```{r}
+fit.pls$loading.weights
+```
+
+Reste maintenant à constuire le modèle PLS à 1 composante :
+
+```{r}
+fit.pls$coefficients
+```
+
+Afin de visualiser les données, on peut construire un modèle à deux composantes
+
+
+
+```{r}
+library(ggplot2)
+fit.pls =plsr(y~X, ncomp = 2, scale = TRUE)
+qplot(fit.pls$scores[, 1], fit.pls$scores[, 2], col= y)
+```
+
+Par construction, la carte des individus issue de PLS est plus "disciminante" que la carte des individus issue de l'ACP
+
+```{r}
+fviz_pca_ind(fit.pca, col.ind = y, )
+```
+
+# Analyse du jeu de données Golub par ACP et PLS
+
+```{r}
+load("Golub.Rdata")
+X = scale(X.golub)
+y = scale(y.golub, scale = FALSE)
+```
+
+## Analyse en Composantes Principales
+
+```{r}
+fit.pca = prcomp(X.golub, scale = TRUE)
+```
+
+
+```{r}
+fviz_pca_ind(fit.pca, col.ind = y.golub)
+```
+
+Bien que très discriminantes la première composante de l'ACP ne suffit pas à séparer complètement les deux types de tumeurs. Regardons les résultats issus de PLS.
+
+```{r}
+fit.pls = plsr(y~X, ncomp = 10)
+```
+
+Visualisons la carte des individus issue de PLS
+
+```{r}
+qplot(fit.pls$scores[, 1], fit.pls$scores[, 2], col= y)
+```
+
