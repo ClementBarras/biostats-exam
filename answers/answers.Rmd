@@ -1,0 +1,79 @@
+---
+title: "Examen de biostatistiques"
+author: "Barras Clément & Delabarre Bertille"
+date: "April 1, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE)
+```
+
+## Chargement du jeu de données `prostate.txt`
+
+```{r cars}
+library(factoextra)
+prostate <- read.delim("../data/prostate.txt", sep=" ")
+n <- nrow(prostate)
+p <- ncol(prostate)
+X = as.matrix(prostate[, 2:p])
+y = as.matrix(prostate$y)
+```
+
+## Question 1.
+
+On effectue une ACP sur les données, et on les représente sur le premier plan principal :
+
+```{r}
+fit.pca = prcomp(X, scale = TRUE, center = TRUE)
+fviz_pca_ind(fit.pca, col.ind = y)
+```
+
+Le premier axe principal explique plus de $40\%$ de la variance, ce qui est remarquable au vu du nombre de variables.
+Cependant, les deux catégories d'individus ne sont pas séparable avec cette projection.
+
+La variable `fit.pca$rotation` contient les vecteurs propres de $\bar{X}^T\bar{X}$ où $\bar{X}$ désigne la matrice des échantillons centrée et réduite.
+
+Afin de représenter quels gènes contribuent le plus aux première et deuxième composantes, on trie les coordonnées des colonnes correspondantes par ordre décroissant en valeur absolue :
+
+```{r}
+sort(abs(fit.pca$rotation[,1]), decreasing = TRUE)[1:10]
+```
+```{r}
+sort(abs(fit.pca$rotation[,2]), decreasing = TRUE)[1:10]
+```
+
+## Question 2.
+
+## Question 3.
+
+<!-- $cov(\textbf{Xa}, \textbf{y}) = \textbf{X}cov(\textbf{a}, \textbf{y}) = \textbf{X}\mathbb{E}[\textbf{ay}^T]$ car $y$ est centrée. -->
+<!-- $cov(\textbf{Xa}, \textbf{y}) = \frac{1}{n}\langle \textbf{Xa}\mid \textbf{y}\rangle = \frac{1}{n}\langle \textbf{X}^T\textbf{y}\mid \textbf{a}\rangle$ -->
+<!-- Et on sait que $\nabla_{\textbf{a}} cov(\textbf{Xa}, \textbf{y}) = \frac{1}{n}\textbf{X}^T\textbf{y}$. -->
+
+<!-- Ce problème est équivalent à la minimisation de $-cov(\textbf{Xa}, \textbf{y})$ selon $\textbf{a}$, avec  $\textbf{a}$ dans un compact (intersection de fermés bornés en dimension finie). Or toute fonction continue sur un compact atteint ses bornes, donc le problème admet une solution $\textbf{a}^*$ (on ne sait pas si elle est unique). -->
+<!-- En notant $\textbf{b} = \frac{1}{n}\textbf{X}^T\textbf{y}$, le Lagrangien du problème s'écrit  :  -->
+<!-- $\mathcal{L}(\textbf{a}, \lambda, \mu) = -\textbf{b}^T\textbf{a} + \lambda(\sum_{j = 1}^{p}|\textbf{a}_j| - s) + \frac{\mu}{2}(\langle \textbf{a}\mid \textbf{a}\rangle - 1)$, avec $\lambda > 0$. -->
+<!-- La fonction valeur absolue n'est pas différentiable en $0$, mais on peut considérer son sous-gradient, qui est $\{1\}$ pour $x>0$, $\{-1\}$ pour $x<0$ et $[-1, 1]$ pour $x = 0$. Soit $s_i$ le sous gradient de la fonction valeur absolue évaluée en $a_i$. -->
+
+<!-- Une condition nécessaire que doit respecter la solution est : -->
+
+<!-- $\forall i \in [| 1, p|], 0 \in \partial_{a_i} \mathcal{L}(\textbf{a}, \lambda, \mu) = -b_i + \lambda s_i +\mu a_i$ -->
+<!-- Supposons $\mu \neq 0$. -->
+
+
+<!-- ### Cas 1: $\mid \frac{b_i}{\mu}\mid > \mid\frac{\lambda}{\mu}\mid$ -->
+
+
+<!-- $\nabla_{\mu} \mathcal{L}(\textbf{a}, \lambda. \mu) = 0 \Longrightarrow 2\mu\textbf{a} = 1$ -->
+<!-- $\nabla_{\textbf{a}} \mathcal{L}(\textbf{a}, \lambda. \mu) = \frac{1}{n}\textbf{X}^T\textbf{y} + \lambda signe(\textbf{a}) + 2\mu\textbf{a}$ -->
+<!-- $\lambda >0$ -->
+<!-- $\frac{1}{n}\textbf{X}^T\textbf{y} + \lambda \frac{|a_i|}{a_i} = 0$ -->
+<!-- $\frac{1}{n}[\textbf{X}^T\textbf{y}]_i + \lambda signe(a_i) = 0$ -->
+<!-- Si $signe(\frac{1}{n}[\textbf{X}^T\textbf{y}]_i) = signe(a_i)$ pas de sol -->
+<!-- Si  -->
+
+<!-- $\frac{1}{n}\sum_{i = 1}^{n}[\textbf{Xa}]_i\textbf{y}_i = \frac{1}{n}\sum_{i = 1}^{n}\sum_{j = 1}^{p}\textbf{X}_{i, j}\textbf{a}_j\textbf{y}_i$ -->
+
+## Question 4
+
