@@ -1,6 +1,6 @@
 ---
 title: "Examen de biostatistiques"
-author: "Barras Clément & Delabarre Bertille"
+author: "Barras Clément & Delebarre Bertille"
 date: "April 1, 2019"
 output: pdf_document
 ---
