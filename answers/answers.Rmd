@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE)
 
 ```{r cars}
 library(factoextra)
+library(glmnet)
 prostate <- read.delim("../data/prostate.txt", sep=" ")
 n <- nrow(prostate)
 p <- ncol(prostate)
@@ -75,5 +76,18 @@ sort(abs(fit.pca$rotation[,2]), decreasing = TRUE)[1:10]
 
 <!-- $\frac{1}{n}\sum_{i = 1}^{n}[\textbf{Xa}]_i\textbf{y}_i = \frac{1}{n}\sum_{i = 1}^{n}\sum_{j = 1}^{p}\textbf{X}_{i, j}\textbf{a}_j\textbf{y}_i$ -->
 
-## Question 4
+## Question 8
 
+On construit un modèle de régression logistique parcimonieuse via le package `glmnet`.
+La fonction `cv.glmnet` permet de détermniner la meilleure valeur du coefficient `lambda` par validation croisée (plus précisément, selon la procédure "leave one out" afin d'éviter tout effet aléatoire). 
+On choisit pour `lambda` la valeur `lambda.min`, qui minimise l'erreur sur la validation croisée
+```{r}
+fit.logreg = cv.glmnet(X, y, family = "binomial", alpha = 1, nfolds = n, grouped = FALSE)
+best_lambda = fit.logreg$lambda.min
+best_lambda_index = findInterval(1-best_lambda, 1-fit.logreg$lambda)
+```
+
+Le nombre de variables sélectionnées est obtenu via l'attribut `glmnet.fit$df` :
+```{r}
+fit.logreg$glmnet.fit$df[best_lambda_index]
+```
