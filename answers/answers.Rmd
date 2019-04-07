@@ -15,10 +15,10 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE)
 library(factoextra)
 library(glmnet)
 prostate <- read.delim("../data/prostate.txt", sep=" ")
-n <- nrow(prostate)
-p <- ncol(prostate)
-X = as.matrix(prostate[, 2:p])
+X = as.matrix(prostate[, -1])
 y = as.matrix(prostate$y)
+n <- nrow(X)
+p <- ncol(X)
 ```
 
 ## Question 1.
@@ -45,6 +45,49 @@ sort(abs(fit.pca$rotation[,2]), decreasing = TRUE)[1:10]
 ```
 
 ## Question 2.
+
+Dans cette partie, nous séparons le jeu de données en deux parties : les individus sains et les individus malades.
+
+```{r}
+Xsain = X[1:50,]
+Xmalade = X[51:102,]
+```
+
+Nous effectuons un test de Student sur chacune des variables afin de comparer par leur moyenne les échantillons sains et les échantillons malades sur cette variable. Selon l'hypothèse $\mathcal{H}_0$, la variable correspond à un gène qui ne s'exprime pas différentiellement entre patients et contrôles. Selon l'hypothèse $\mathcal{H}_1$, le gène s'exprime différentiellement, c'est à dire que les échantillons ont une distribution différente sur cette variable.
+
+Nous fixons une p-value $p = 0.05$, sans correction en premier lieu :
+
+```{r}
+pvalue = 0.05
+ttests <- list()
+selected.variables <- list()
+for (i in 1:p)
+{
+  ttests[[i]] <- t.test(Xsain[, i], Xmalade[, i])
+  if (ttests[[i]]$p.value<pvalue)
+  {
+    selected.variables <- append(selected.variables, i)
+  }
+}
+sprintf("Number of selected variables before correction: %d", length(selected.variables))
+
+```
+
+Le nombre de variables sélectionnées comme ayant une influence sur le statut de l'échantillon est assez élevé : il y a sûrement un certain nombre de faux positifs étant donné le grand nombre de tests. On applique donc une correction de Bonferroni en divisant notre pvalue par le nombre de tests que l'on effectue :
+
+```{r}
+pvalue = 0.05/p
+selected.variables <- list()
+for (i in 1:p)
+{
+  if (ttests[[i]]$p.value<pvalue)
+  {
+    selected.variables <- append(selected.variables, i)
+  }
+}
+sprintf("Number of selected variables after correction: %d", length(selected.variables))
+```
+On a un nombre de variables sélectionnées beaucoup plus restreint, au prix d'avoir généré sans doute davantage de faux négatifs.
 
 ## Question 3.
 
